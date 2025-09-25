@@ -2,7 +2,7 @@
 
 ## Project Summary
 
-This project delivers a high-performance, interactive Streamlit dashboard for binary sentiment classification (Positive/Negative) using the IMDb Movie Review Dataset. The solution meets all Second-Year requirements and introduces an **Ensemble Learning** architecture to maximize predictive performance. The entire application is packaged within a clean Streamlit interface, ensuring a professional and user-friendly demonstration.
+This project delivers a high-performance, interactive Streamlit dashboard for binary sentiment classification (Positive/Negative) using the IMDb Movie Review Dataset. The solution introduces an **Ensemble Learning** architecture to maximize predictive performance. The entire application is packaged within a clean Streamlit interface, ensuring a professional and user-friendly demonstration.
 
 ---
 
