@@ -14,11 +14,7 @@ import numpy as np
 
 @st.cache_data
 def load_and_preprocess_data():
-    try:
-        df = pd.read_csv('IMDB Dataset.csv')
-    except FileNotFoundError:
-        st.error("Dataset not found.")
-        st.stop()
+    df = pd.read_csv('IMDB Dataset.csv')
     df['review'] = df['review'].apply(lambda x: re.sub(r'<br /><br />', ' ', x))
     df['review'] = df['review'].str.lower()
     df['review'] = df['review'].apply(lambda x: re.sub(r'[^a-zA-Z\s]', '', x))
@@ -203,7 +199,10 @@ def main():
                     user_review_vec = st.session_state['vectorizer'].transform([clean_review])
                     prediction = st.session_state['ensemble_model'].predict(user_review_vec)
                     sentiment = "Positive" if prediction[0] == 1 else "Negative"
-                    st.success(f"The model predicts the sentiment is: **{sentiment}**")
+                    if sentiment == "Positive":
+                        st.success(f"The model predicts the sentiment is: **{sentiment}**")
+                    else:
+                        st.warning(f"The model predicts the sentiment is: **{sentiment}**")
                 else:
                     st.warning("Please enter a review to get a prediction.")
 
