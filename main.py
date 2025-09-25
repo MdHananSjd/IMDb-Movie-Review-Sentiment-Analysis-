@@ -3,15 +3,14 @@ import pandas as pd
 import re
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, learning_curve
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, ConfusionMatrixDisplay
 import sys
 import numpy as np
-from sklearn.model_selection import learning_curve
 
 @st.cache_data
 def load_and_preprocess_data():
@@ -39,7 +38,7 @@ def train_individual_model(X_train_vec, y_train, model_type, X_test_vec, y_test)
     if model_type == 'Logistic Regression':
         model = LogisticRegression(solver='liblinear', random_state=42)
     elif model_type == 'SVM':
-        model = SVC(kernel='linear', C=1.0, random_state=42)
+        model = LinearSVC(C=1.0, random_state=42, max_iter=2000)
     elif model_type == 'Random Forest':
         model = RandomForestClassifier(n_estimators=50, random_state=42)
     with st.spinner(f"Training {model_type}..."):
@@ -67,18 +66,21 @@ def train_ensemble_model(X_train_vec, y_train, X_test_vec, y_test):
 
 @st.cache_data
 def evaluate_model(_model, _X_test_vec, y_test):
+
     y_pred = _model.predict(_X_test_vec)
     accuracy = accuracy_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred)
     recall = recall_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
+    
     return y_pred, accuracy, precision, recall, f1
+
 
 def plot_confusion_matrix(y_true, y_pred, title):
     cm = confusion_matrix(y_true, y_pred)
     fig, ax = plt.subplots(figsize=(6, 5))
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Negative', 'Positive'])
-    disp.plot(cmap=plt.cm.Blues, ax=ax, colorbar=False)
+    disp.plot(cmap=plt.cm.Blues, ax=ax, colorbar=False) 
     plt.title(title)
     st.pyplot(fig)
     plt.close(fig)
@@ -118,10 +120,11 @@ def display_model_results(model, model_name, X_test, y_test, vectorizer, X_train
         plot_learning_curve(model, vectorizer.transform(X_train), y_train, f"{model_name} Learning Curve")
 
 def main():
-    st.set_page_config(page_title='Movie Review', page_icon="👾", layout='wide')
+    st.set_page_config(page_title='Movie Review', layout='wide')
     st.title("IMDb Movie Review Sentiment Analysis")
     st.write("This application analyzes the sentiment of reviews based on an IMBD movie review dataset, using multiple models and a voting ensemble.")
     st.write("Very rushed attempt. Do not judge.")
+    
     if 'data_loaded' not in st.session_state:
         st.session_state['X_train'], st.session_state['X_test'], st.session_state['y_train'], st.session_state['y_test'] = load_and_preprocess_data()
         st.session_state['vectorizer'] = get_vectorizer(st.session_state['X_train'])
@@ -130,7 +133,7 @@ def main():
     st.header("Data Distribution")
     sentiment_counts = st.session_state['y_train'].value_counts()
     st.write("This chart shows the distribution of positive and negative reviews in the training data.")
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(8, 6))
     sentiment_counts.plot(kind='bar', color=['skyblue', 'salmon'])
     plt.title('Sentiment Distribution')
     plt.xlabel('Sentiment')
