@@ -72,7 +72,7 @@ def evaluate_model(_model, _X_test_vec, y_test):
     precision = precision_score(y_test, y_pred)
     recall = recall_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
-    
+
     return y_pred, accuracy, precision, recall, f1
 
 
@@ -199,7 +199,6 @@ def main():
             user_review = st.text_area("Enter a movie review to predict its sentiment:", "")
             if st.button("Predict Sentiment"):
                 if user_review:
-                    clean_review = re.sub(r'<br /><br />', ' ', user_review)
                     clean_review = re.sub(r'[^a-zA-Z\s]', '', clean_review).lower()
                     user_review_vec = st.session_state['vectorizer'].transform([clean_review])
                     prediction = st.session_state['ensemble_model'].predict(user_review_vec)
